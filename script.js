@@ -60,18 +60,18 @@ if (themeToggle) {
 
 const enquiryForm = document.querySelector('#enquiry-form');
 if (enquiryForm) {
-  const universitySelect = enquiryForm.querySelector('#university');
-  const otherUniversityField = enquiryForm.querySelector('#other-university-field');
-  const otherUniversityInput = enquiryForm.querySelector('#other-university');
+  const studyCountrySelect = enquiryForm.querySelector('#study-country');
+  const otherCountryField = enquiryForm.querySelector('#other-country-field');
+  const otherCountryInput = enquiryForm.querySelector('#other-country');
   const status = enquiryForm.querySelector('#form-status');
 
-  const updateOtherUniversity = () => {
-    const showOther = universitySelect.value === 'Another university';
-    otherUniversityField.classList.toggle('visible', showOther);
-    otherUniversityInput.required = showOther;
+  const updateOtherCountry = () => {
+    const showOther = studyCountrySelect.value === 'Another country';
+    otherCountryField.classList.toggle('visible', showOther);
+    otherCountryInput.required = showOther;
   };
-  universitySelect.addEventListener('change', updateOtherUniversity);
-  updateOtherUniversity();
+  studyCountrySelect.addEventListener('change', updateOtherCountry);
+  updateOtherCountry();
 
   const requestedService = new URLSearchParams(location.search).get('service');
   if (requestedService) {
@@ -105,9 +105,9 @@ if (enquiryForm) {
     }
 
     const values = new FormData(enquiryForm);
-    const university = values.get('university') === 'Another university'
-      ? values.get('otherUniversity')
-      : values.get('university');
+    const studyCountry = values.get('studyCountry') === 'Another country'
+      ? values.get('otherCountry')
+      : values.get('studyCountry');
     const body = [
       `Name: ${values.get('name')}`,
       `Email: ${values.get('email')}`,
@@ -115,7 +115,7 @@ if (enquiryForm) {
       `Current country: ${values.get('country') || 'Not provided'}`,
       `Study level: ${values.get('studyLevel') || 'Not selected'}`,
       `Services requested: ${selectedServices.map((checkbox) => checkbox.value).join(', ')}`,
-      `University: ${university}`,
+      `Preferred study country: ${studyCountry}`,
       '',
       'Message:',
       values.get('message'),

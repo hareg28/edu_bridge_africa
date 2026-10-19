@@ -12,7 +12,7 @@ const services = [
 ];
 
 export default function ContactForm() {
-  const [university, setUniversity] = useState('Not sure yet');
+  const [studyCountry, setStudyCountry] = useState('Still deciding');
   const [status, setStatus] = useState({ message: 'Your message will open in your email app after EduBridge’s contact email is configured.', type: '' });
   const servicesRef = useRef(null);
 
@@ -51,9 +51,9 @@ export default function ContactForm() {
     }
 
     const values = new FormData(form);
-    const chosenUniversity = values.get('university') === 'Another university'
-      ? values.get('otherUniversity')
-      : values.get('university');
+    const chosenCountry = values.get('studyCountry') === 'Another country'
+      ? values.get('otherCountry')
+      : values.get('studyCountry');
     const emailBody = [
       `Name: ${values.get('name')}`,
       `Email: ${values.get('email')}`,
@@ -61,7 +61,7 @@ export default function ContactForm() {
       `Current country: ${values.get('country') || 'Not provided'}`,
       `Study level: ${values.get('studyLevel') || 'Not selected'}`,
       `Services requested: ${selected.join(', ')}`,
-      `University: ${chosenUniversity}`,
+      `Preferred study country: ${chosenCountry}`,
       '',
       'Message:',
       values.get('message'),
@@ -81,8 +81,8 @@ export default function ContactForm() {
         <label className="field"><span>Current country</span><input name="country" autoComplete="country-name" placeholder="Your country" /></label>
         <label className="field full-field"><span>What would you like to study?</span><select name="studyLevel" defaultValue=""><option value="">Choose a study level</option><option>Bachelor's degree</option><option>Master's degree</option><option>PhD and research</option><option>Short-term training</option><option>Still exploring</option></select></label>
         <fieldset className="field full-field service-field" ref={servicesRef} tabIndex={-1}><legend>Which services are you interested in? *</legend><div className="check-grid">{services.map((service) => <label key={service}><input type="checkbox" name="service" value={service} /><span>{service}</span></label>)}</div><small>Select all that apply.</small></fieldset>
-        <label className="field full-field"><span>Which university would you like to explore?</span><select name="university" value={university} onChange={(event) => setUniversity(event.target.value)}><option value="Not sure yet">I'm still deciding</option><option value="Kent State University">Kent State University (featured partner)</option><option value="Another university">Another university</option><option value="Open to recommendations">I'm open to recommendations</option></select></label>
-        {university === 'Another university' && <label className="field full-field"><span>University name *</span><input name="otherUniversity" required placeholder="Enter the university name" /></label>}
+        <label className="field full-field"><span>Which country would you like to study in?</span><select name="studyCountry" value={studyCountry} onChange={(event) => setStudyCountry(event.target.value)}><option value="Still deciding">I'm still deciding</option><option>United States</option><option>Canada</option><option>United Kingdom</option><option>Australia</option><option>Germany</option><option value="Another country">Another country</option><option value="Open to recommendations">I'm open to recommendations</option></select></label>
+        {studyCountry === 'Another country' && <label className="field full-field"><span>Country name *</span><input name="otherCountry" required placeholder="Enter the country name" /></label>}
         <label className="field full-field"><span>Tell us about your plans *</span><textarea name="message" rows="5" required placeholder="Your study interests, goals, or questions" /></label>
       </div>
       <div className="form-submit"><button className="button button-gold" type="submit">Prepare my enquiry <span>↗</span></button><p className={status.type ? `form-status-${status.type}` : ''} role="status" aria-live="polite">{status.message}</p></div>
