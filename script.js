@@ -97,12 +97,7 @@ if (enquiryForm) {
       return;
     }
 
-    const recipient = (document.body.dataset.contactEmail || '').trim();
-    if (!recipient || recipient.includes('[Your Contact Email]')) {
-      status.textContent = 'Your message is ready, but EduBridge’s contact email has not been added yet, so it was not sent.';
-      status.classList.add('form-status-error');
-      return;
-    }
+    const recipient = (document.body.dataset.contactEmail || 'hareg9518@gmail.com').trim();
 
     const values = new FormData(enquiryForm);
     const studyCountry = values.get('studyCountry') === 'Another country'

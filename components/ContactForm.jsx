@@ -10,10 +10,11 @@ const services = [
   'Scholarship and funding information',
   'Institutional partnerships',
 ];
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hareg9518@gmail.com';
 
 export default function ContactForm() {
   const [studyCountry, setStudyCountry] = useState('Still deciding');
-  const [status, setStatus] = useState({ message: 'Your message will open in your email app after EduBridge’s contact email is configured.', type: '' });
+  const [status, setStatus] = useState({ message: 'Your email app will open with your enquiry ready to send.', type: '' });
   const servicesRef = useRef(null);
 
   useEffect(() => {
@@ -44,11 +45,7 @@ export default function ContactForm() {
       return;
     }
 
-    const recipient = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || '').trim();
-    if (!recipient || recipient.includes('[Your Contact Email]')) {
-      setStatus({ message: 'Your message is ready, but EduBridge’s contact email has not been added yet, so it was not sent.', type: 'error' });
-      return;
-    }
+    const recipient = contactEmail.trim();
 
     const values = new FormData(form);
     const chosenCountry = values.get('studyCountry') === 'Another country'
@@ -86,7 +83,7 @@ export default function ContactForm() {
         <label className="field full-field"><span>Tell us about your plans *</span><textarea name="message" rows="5" required placeholder="Your study interests, goals, or questions" /></label>
       </div>
       <div className="form-submit"><button className="button button-gold" type="submit">Prepare my enquiry <span>↗</span></button><p className={status.type ? `form-status-${status.type}` : ''} role="status" aria-live="polite">{status.message}</p></div>
-      <p className="contact-email">Email: <span>[Your Contact Email]</span></p>
+      <p className="contact-email">Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
     </form>
   );
 }
