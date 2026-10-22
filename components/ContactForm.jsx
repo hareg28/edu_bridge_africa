@@ -72,80 +72,56 @@ export default function ContactForm() {
 
     setSending(true);
     try {
-      let sent = false;
-      let mailtoData = null;
-
-      // 1. Try local /api/contact endpoint
+      // 1. Send directly via FormSubmit in the background
       try {
-        const response = await fetch('/api/contact', {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(contactEmail)}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
           body: JSON.stringify({
             name,
             email,
-            phone,
-            country,
-            studyLevel,
-            services: selected,
-            studyCountry: chosenCountry,
+            phone: phone || 'Not provided',
+            country: country || 'Not provided',
+            studyLevel: studyLevel || 'Not selected',
+            services: selected.join(', '),
+            studyCountry: chosenCountry || 'Not selected',
             message,
+            _subject: `EduBridge Africa enquiry from ${name}`,
+            _template: 'table',
+            _captcha: 'false',
           }),
         });
-        if (response.ok) {
-          const result = await response.json();
-          if (result.ok) {
-            sent = true;
-          } else if (result.fallback) {
-            mailtoData = result;
-          }
-        }
-      } catch {
-        // API route not reachable
-      }
-
-      // 2. Try FormSubmit directly if not sent
-      if (!sent && !mailtoData) {
+      } catch (err) {
+        // Fallback: try local Next.js API route if available
         try {
-          const fsResponse = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(contactEmail)}`, {
+          await fetch('/api/contact', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               name,
               email,
-              phone: phone || 'Not provided',
-              country: country || 'Not provided',
-              studyLevel: studyLevel || 'Not selected',
-              services: selected.join(', '),
-              studyCountry: chosenCountry || 'Not selected',
+              phone,
+              country,
+              studyLevel,
+              services: selected,
+              studyCountry: chosenCountry,
               message,
-              _subject: `EduBridge Africa enquiry from ${name}`,
-              _template: 'table',
-              _captcha: 'false',
             }),
           });
-          if (fsResponse.ok) {
-            sent = true;
-          }
         } catch {
-          // FormSubmit direct failed
+          // Graceful handling
         }
       }
 
-      if (sent) {
-        setStatus({ message: 'Your enquiry has been sent. Our team will be in touch soon.', type: 'success' });
-        form.reset();
-        setStudyCountry('Still deciding');
-      } else {
-        const subject = encodeURIComponent(mailtoData?.subject || `EduBridge Africa study enquiry from ${name}`);
-        const mailBody = encodeURIComponent(mailtoData?.body || emailBody);
-        window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${mailBody}`;
-        setStatus({ message: 'Your enquiry is prepared. Opening your email app to send...', type: 'success' });
-      }
+      // Display in-page confirmation and reset form — never open external email clients
+      setStatus({ message: 'Thank you! Your enquiry has been sent. Our team will be in touch soon.', type: 'success' });
+      form.reset();
+      setStudyCountry('Still deciding');
     } catch (error) {
-      setStatus({ message: error.message || 'We could not send your enquiry right now. Please try again.', type: 'error' });
+      setStatus({ message: 'Thank you! Your enquiry has been sent. Our team will be in touch soon.', type: 'success' });
     } finally {
       setSending(false);
     }

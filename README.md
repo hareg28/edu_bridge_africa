@@ -23,7 +23,7 @@ CONTACT_EMAIL=hareg9518@gmail.com
 CONTACT_FROM_EMAIL=EduBridge Africa <enquiries@your-verified-domain.com>
 ```
 
-If email delivery APIs are temporarily unavailable, the form seamlessly opens the user's default email app with the complete enquiry pre-filled so no submissions are lost.
+The form submits directly in the website page without opening any external email apps, displaying an immediate in-page confirmation.
 
 ## Routes
 

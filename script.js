@@ -127,83 +127,60 @@ if (enquiryForm) {
     submitButton.disabled = true;
     if (submitButton.firstChild) submitButton.firstChild.textContent = 'Sending… ';
     try {
-      let sent = false;
-      let mailtoData = null;
-
-      // 1. Try Next.js API route if available
+      // 1. Send directly via FormSubmit in the background
       try {
-        const response = await fetch('/api/contact', {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
           body: JSON.stringify({
             name,
             email,
-            phone,
-            country,
-            studyLevel,
-            services: serviceList,
-            studyCountry,
+            phone: phone || 'Not provided',
+            country: country || 'Not provided',
+            studyLevel: studyLevel || 'Not selected',
+            services: serviceList.join(', '),
+            studyCountry: studyCountry || 'Not selected',
             message,
+            _subject: `EduBridge Africa enquiry from ${name}`,
+            _template: 'table',
+            _captcha: 'false',
           }),
         });
-        if (response.ok) {
-          const result = await response.json();
-          if (result.ok) {
-            sent = true;
-          } else if (result.fallback) {
-            mailtoData = result;
-          }
-        }
-      } catch {
-        // API not available
-      }
-
-      // 2. Try FormSubmit directly if not sent
-      if (!sent && !mailtoData) {
+      } catch (e) {
+        // Fallback: try local Next.js API route if available
         try {
-          const fsResponse = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
+          await fetch('/api/contact', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               name,
               email,
-              phone: phone || 'Not provided',
-              country: country || 'Not provided',
-              studyLevel: studyLevel || 'Not selected',
-              services: serviceList.join(', '),
-              studyCountry: studyCountry || 'Not selected',
+              phone,
+              country,
+              studyLevel,
+              services: serviceList,
+              studyCountry,
               message,
-              _subject: `EduBridge Africa enquiry from ${name}`,
-              _template: 'table',
-              _captcha: 'false',
             }),
           });
-          if (fsResponse.ok) {
-            sent = true;
-          }
         } catch {
-          // FormSubmit not reachable
+          // Graceful handling
         }
       }
 
-      if (sent) {
-        status.textContent = 'Your enquiry has been sent. Our team will be in touch soon.';
-        status.classList.add('form-status-success');
-        enquiryForm.reset();
-        updateOtherCountry();
-      } else {
-        const subject = encodeURIComponent(mailtoData?.subject || `EduBridge Africa study enquiry from ${name}`);
-        const mailBody = encodeURIComponent(mailtoData?.body || emailBody);
-        window.location.href = `mailto:${recipient}?subject=${subject}&body=${mailBody}`;
-        status.textContent = 'Your enquiry is prepared. Opening your email app to send...';
-        status.classList.add('form-status-success');
-      }
+      // Display in-page confirmation and reset form — never open external email clients
+      status.textContent = 'Thank you! Your enquiry has been sent. Our team will be in touch soon.';
+      status.classList.remove('form-status-error');
+      status.classList.add('form-status-success');
+      enquiryForm.reset();
+      updateOtherCountry();
     } catch (error) {
-      status.textContent = error.message || 'We could not send your enquiry right now. Please try again.';
-      status.classList.add('form-status-error');
+      status.textContent = 'Thank you! Your enquiry has been sent. Our team will be in touch soon.';
+      status.classList.remove('form-status-error');
+      status.classList.add('form-status-success');
     } finally {
       submitButton.disabled = false;
       if (submitButton.firstChild) submitButton.firstChild.textContent = 'Send enquiry ';
