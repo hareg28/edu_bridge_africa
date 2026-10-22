@@ -84,106 +84,60 @@ if (enquiryForm) {
     if (matchingLevel) studyLevel.value = matchingLevel.value;
   }
 
-  enquiryForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+  enquiryForm.addEventListener('submit', (event) => {
     status.classList.remove('form-status-error', 'form-status-success');
 
-    if (!enquiryForm.reportValidity()) return;
+    if (!enquiryForm.reportValidity()) {
+      event.preventDefault();
+      return;
+    }
     const selectedServices = [...enquiryForm.querySelectorAll('[name="service"]:checked')];
     if (selectedServices.length === 0) {
+      event.preventDefault();
       status.textContent = 'Please choose at least one service so we know how to help.';
       status.classList.add('form-status-error');
       enquiryForm.querySelector('[name="service"]').focus();
       return;
     }
 
-    const recipient = (document.body.dataset.contactEmail || 'hareg9518@gmail.com').trim();
-    const values = new FormData(enquiryForm);
-    const studyCountry = values.get('studyCountry') === 'Another country'
-      ? values.get('otherCountry')
-      : values.get('studyCountry');
-    const name = values.get('name') || '';
-    const email = values.get('email') || '';
-    const phone = values.get('phone') || '';
-    const country = values.get('country') || '';
-    const studyLevel = values.get('studyLevel') || '';
-    const message = values.get('message') || '';
-    const serviceList = selectedServices.map((checkbox) => checkbox.value);
-
-    const emailBody = [
-      `Name: ${name}`,
-      `Email: ${email}`,
-      `Phone / WhatsApp: ${phone || 'Not provided'}`,
-      `Current country: ${country || 'Not provided'}`,
-      `Study level: ${studyLevel || 'Not selected'}`,
-      `Services requested: ${serviceList.join(', ')}`,
-      `Preferred study country: ${studyCountry || 'Not selected'}`,
-      '',
-      'Message:',
-      message,
-    ].join('\n');
-
     const submitButton = enquiryForm.querySelector('[type="submit"]');
     submitButton.disabled = true;
     if (submitButton.firstChild) submitButton.firstChild.textContent = 'Sending… ';
-    try {
-      // 1. Send directly via FormSubmit in the background
-      try {
-        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            phone: phone || 'Not provided',
-            country: country || 'Not provided',
-            studyLevel: studyLevel || 'Not selected',
-            services: serviceList.join(', '),
-            studyCountry: studyCountry || 'Not selected',
-            message,
-            _subject: `EduBridge Africa enquiry from ${name}`,
-            _template: 'table',
-            _captcha: 'false',
-          }),
-        });
-      } catch (e) {
-        // Fallback: try local Next.js API route if available
-        try {
-          await fetch('/api/contact', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              email,
-              phone,
-              country,
-              studyLevel,
-              services: serviceList,
-              studyCountry,
-              message,
-            }),
-          });
-        } catch {
-          // Graceful handling
-        }
-      }
 
-      // Display in-page confirmation and reset form — never open external email clients
+    // Background call to /api/contact in case Resend is configured (3s max timeout)
+    try {
+      const values = new FormData(enquiryForm);
+      const studyCountry = values.get('studyCountry') === 'Another country'
+        ? values.get('otherCountry')
+        : values.get('studyCountry');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          name: values.get('name'),
+          email: values.get('email'),
+          phone: values.get('phone'),
+          country: values.get('country'),
+          studyLevel: values.get('studyLevel'),
+          services: selectedServices.map((checkbox) => checkbox.value),
+          studyCountry,
+          message: values.get('message'),
+        }),
+      }).catch(() => {}).finally(() => clearTimeout(timeoutId));
+    } catch {}
+
+    // Form submits into the hidden iframe in the background without navigating
+    setTimeout(() => {
       status.textContent = 'Thank you! Your enquiry has been sent. Our team will be in touch soon.';
       status.classList.remove('form-status-error');
       status.classList.add('form-status-success');
       enquiryForm.reset();
       updateOtherCountry();
-    } catch (error) {
-      status.textContent = 'Thank you! Your enquiry has been sent. Our team will be in touch soon.';
-      status.classList.remove('form-status-error');
-      status.classList.add('form-status-success');
-    } finally {
       submitButton.disabled = false;
       if (submitButton.firstChild) submitButton.firstChild.textContent = 'Send enquiry ';
-    }
+    }, 1200);
   });
 }
