@@ -11,6 +11,8 @@ const services = [
   'Institutional partnerships',
 ];
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hareg9518@gmail.com';
+// FormSubmit secure hash (replaces raw email in action URL — avoids spam exposure)
+const formSubmitId = 'd3e7187fa7619c5e92879916a7a55436';
 
 export default function ContactForm() {
   const [studyCountry, setStudyCountry] = useState('Still deciding');
@@ -91,7 +93,7 @@ export default function ContactForm() {
       <iframe name="enquiry-hidden-frame" id="enquiry-hidden-frame" style={{ display: 'none' }} title="enquiry-target" />
       <form
         className="enquiry-form"
-        action={`https://formsubmit.co/${encodeURIComponent(contactEmail)}`}
+        action={`https://formsubmit.co/${formSubmitId}`}
         method="POST"
         target="enquiry-hidden-frame"
         onSubmit={handleSubmit}
