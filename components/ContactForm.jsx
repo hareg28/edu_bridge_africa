@@ -17,7 +17,7 @@ const WEB3FORMS_KEY = 'f90140af-459c-4748-9ce8-495b734ea831';
 
 export default function ContactForm() {
   const [studyCountry, setStudyCountry] = useState('Still deciding');
-  const [status, setStatus] = useState({ message: 'We'll send your enquiry directly to our team.', type: '' });
+  const [status, setStatus] = useState({ message: "We\u2019ll send your enquiry directly to our team.", type: '' });
   const [sending, setSending] = useState(false);
   const servicesRef = useRef(null);
   const formRef = useRef(null);
