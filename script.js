@@ -97,40 +97,116 @@ if (enquiryForm) {
       return;
     }
 
+    const recipient = (document.body.dataset.contactEmail || 'hareg9518@gmail.com').trim();
     const values = new FormData(enquiryForm);
     const studyCountry = values.get('studyCountry') === 'Another country'
       ? values.get('otherCountry')
       : values.get('studyCountry');
+    const name = values.get('name') || '';
+    const email = values.get('email') || '';
+    const phone = values.get('phone') || '';
+    const country = values.get('country') || '';
+    const studyLevel = values.get('studyLevel') || '';
+    const message = values.get('message') || '';
+    const serviceList = selectedServices.map((checkbox) => checkbox.value);
+
+    const emailBody = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Phone / WhatsApp: ${phone || 'Not provided'}`,
+      `Current country: ${country || 'Not provided'}`,
+      `Study level: ${studyLevel || 'Not selected'}`,
+      `Services requested: ${serviceList.join(', ')}`,
+      `Preferred study country: ${studyCountry || 'Not selected'}`,
+      '',
+      'Message:',
+      message,
+    ].join('\n');
+
     const submitButton = enquiryForm.querySelector('[type="submit"]');
     submitButton.disabled = true;
-    submitButton.firstChild.textContent = 'Sending… ';
+    if (submitButton.firstChild) submitButton.firstChild.textContent = 'Sending… ';
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: values.get('name'),
-          email: values.get('email'),
-          phone: values.get('phone'),
-          country: values.get('country'),
-          studyLevel: values.get('studyLevel'),
-          services: selectedServices.map((checkbox) => checkbox.value),
-          studyCountry,
-          message: values.get('message'),
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'We could not send your enquiry right now.');
-      status.textContent = 'Your enquiry has been sent. Our team will be in touch soon.';
-      status.classList.add('form-status-success');
-      enquiryForm.reset();
-      updateOtherCountry();
+      let sent = false;
+      let mailtoData = null;
+
+      // 1. Try Next.js API route if available
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            country,
+            studyLevel,
+            services: serviceList,
+            studyCountry,
+            message,
+          }),
+        });
+        if (response.ok) {
+          const result = await response.json();
+          if (result.ok) {
+            sent = true;
+          } else if (result.fallback) {
+            mailtoData = result;
+          }
+        }
+      } catch {
+        // API not available
+      }
+
+      // 2. Try FormSubmit directly if not sent
+      if (!sent && !mailtoData) {
+        try {
+          const fsResponse = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              phone: phone || 'Not provided',
+              country: country || 'Not provided',
+              studyLevel: studyLevel || 'Not selected',
+              services: serviceList.join(', '),
+              studyCountry: studyCountry || 'Not selected',
+              message,
+              _subject: `EduBridge Africa enquiry from ${name}`,
+              _template: 'table',
+              _captcha: 'false',
+            }),
+          });
+          if (fsResponse.ok) {
+            sent = true;
+          }
+        } catch {
+          // FormSubmit not reachable
+        }
+      }
+
+      if (sent) {
+        status.textContent = 'Your enquiry has been sent. Our team will be in touch soon.';
+        status.classList.add('form-status-success');
+        enquiryForm.reset();
+        updateOtherCountry();
+      } else {
+        const subject = encodeURIComponent(mailtoData?.subject || `EduBridge Africa study enquiry from ${name}`);
+        const mailBody = encodeURIComponent(mailtoData?.body || emailBody);
+        window.location.href = `mailto:${recipient}?subject=${subject}&body=${mailBody}`;
+        status.textContent = 'Your enquiry is prepared. Opening your email app to send...';
+        status.classList.add('form-status-success');
+      }
     } catch (error) {
       status.textContent = error.message || 'We could not send your enquiry right now. Please try again.';
       status.classList.add('form-status-error');
     } finally {
       submitButton.disabled = false;
-      submitButton.firstChild.textContent = 'Send enquiry ';
+      if (submitButton.firstChild) submitButton.firstChild.textContent = 'Send enquiry ';
     }
   });
 }

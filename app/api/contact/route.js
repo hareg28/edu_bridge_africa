@@ -2,12 +2,8 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request) {
   const apiKey = process.env.RESEND_API_KEY;
-  const recipient = process.env.CONTACT_EMAIL || process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+  const recipient = process.env.CONTACT_EMAIL || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hareg9518@gmail.com';
   const sender = process.env.CONTACT_FROM_EMAIL;
-
-  if (!apiKey || !recipient || !sender) {
-    return Response.json({ error: 'The enquiry service is not configured yet. Please email us directly.' }, { status: 503 });
-  }
 
   let enquiry;
   try {
@@ -38,27 +34,66 @@ export async function POST(request) {
     message,
   ].join('\n');
 
+  // 1. Try Resend if configured
+  if (apiKey && sender) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: sender,
+          to: [recipient],
+          reply_to: email,
+          subject: `EduBridge Africa enquiry from ${name}`,
+          text: emailBody,
+        }),
+      });
+
+      if (response.ok) {
+        return Response.json({ ok: true });
+      }
+      console.warn('Resend response status:', response.status);
+    } catch (error) {
+      console.warn('Resend delivery failed:', error);
+    }
+  }
+
+  // 2. Try FormSubmit (works out of the box without requiring API keys)
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const fsResponse = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
       body: JSON.stringify({
-        from: sender,
-        to: [recipient],
-        reply_to: email,
-        subject: `EduBridge Africa enquiry from ${name}`,
-        text: emailBody,
+        name,
+        email,
+        phone: enquiry.phone || 'Not provided',
+        country: enquiry.country || 'Not provided',
+        studyLevel: enquiry.studyLevel || 'Not selected',
+        services: services.join(', '),
+        studyCountry: enquiry.studyCountry || 'Not selected',
+        message,
+        _subject: `EduBridge Africa enquiry from ${name}`,
+        _template: 'table',
+        _captcha: 'false',
       }),
     });
 
-    if (!response.ok) {
-      console.error('Enquiry email provider rejected the request:', response.status);
-      return Response.json({ error: 'We could not send your enquiry right now. Please try again or email us directly.' }, { status: 502 });
+    if (fsResponse.ok) {
+      return Response.json({ ok: true });
     }
-
-    return Response.json({ ok: true });
-  } catch (error) {
-    console.error('Enquiry email delivery failed:', error);
-    return Response.json({ error: 'We could not send your enquiry right now. Please try again or email us directly.' }, { status: 502 });
+  } catch (fsError) {
+    console.warn('FormSubmit delivery failed:', fsError);
   }
+
+  // 3. Fallback response allowing client to open email app directly
+  return Response.json({
+    ok: false,
+    fallback: true,
+    recipient,
+    subject: `EduBridge Africa enquiry from ${name}`,
+    body: emailBody,
+  });
 }
