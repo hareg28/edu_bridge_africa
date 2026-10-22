@@ -15,13 +15,15 @@ Then open [http://localhost:3000](http://localhost:3000). Stop the local server 
 
 ## Contact form
 
-The enquiry form validates the visitor's selections and opens a prepared email draft. To set the recipient, create `.env.local` in the project root and add:
+The enquiry form sends submissions to the EduBridge Africa inbox through the Resend email API. To enable delivery, create a Resend account, verify the sending domain, then copy `.env.example` to `.env.local` and set:
 
 ```text
-NEXT_PUBLIC_CONTACT_EMAIL=your-real-contact-email
+RESEND_API_KEY=your-resend-api-key
+CONTACT_EMAIL=your-real-contact-email
+CONTACT_FROM_EMAIL=EduBridge Africa <enquiries@your-verified-domain.com>
 ```
 
-Restart the development server after changing this value. The project does not include a form-mail service or backend.
+Restart the development server after changing these values. `CONTACT_FROM_EMAIL` must use a domain verified in Resend. The API key stays on the server and must never use a `NEXT_PUBLIC_` variable.
 
 ## Routes
 

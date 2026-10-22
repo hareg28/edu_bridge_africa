@@ -14,7 +14,8 @@ const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hareg9518@gmail.c
 
 export default function ContactForm() {
   const [studyCountry, setStudyCountry] = useState('Still deciding');
-  const [status, setStatus] = useState({ message: 'Your email app will open with your enquiry ready to send.', type: '' });
+  const [status, setStatus] = useState({ message: 'We’ll send your enquiry directly to our team.', type: '' });
+  const [sending, setSending] = useState(false);
   const servicesRef = useRef(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function ContactForm() {
     }
   }, []);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
     setStatus({ message: '', type: '' });
@@ -45,27 +46,36 @@ export default function ContactForm() {
       return;
     }
 
-    const recipient = contactEmail.trim();
-
     const values = new FormData(form);
     const chosenCountry = values.get('studyCountry') === 'Another country'
       ? values.get('otherCountry')
       : values.get('studyCountry');
-    const emailBody = [
-      `Name: ${values.get('name')}`,
-      `Email: ${values.get('email')}`,
-      `Phone / WhatsApp: ${values.get('phone') || 'Not provided'}`,
-      `Current country: ${values.get('country') || 'Not provided'}`,
-      `Study level: ${values.get('studyLevel') || 'Not selected'}`,
-      `Services requested: ${selected.join(', ')}`,
-      `Preferred study country: ${chosenCountry}`,
-      '',
-      'Message:',
-      values.get('message'),
-    ].join('\n');
-    const subject = encodeURIComponent('EduBridge Africa study enquiry');
-    window.location.href = `mailto:${recipient}?subject=${subject}&body=${encodeURIComponent(emailBody)}`;
-    setStatus({ message: 'Your email app should open with your enquiry ready to send.', type: 'success' });
+    setSending(true);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: values.get('name'),
+          email: values.get('email'),
+          phone: values.get('phone'),
+          country: values.get('country'),
+          studyLevel: values.get('studyLevel'),
+          services: selected,
+          studyCountry: chosenCountry,
+          message: values.get('message'),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'We could not send your enquiry right now.');
+      setStatus({ message: 'Your enquiry has been sent. Our team will be in touch soon.', type: 'success' });
+      form.reset();
+      setStudyCountry('Still deciding');
+    } catch (error) {
+      setStatus({ message: error.message || 'We could not send your enquiry right now. Please try again.', type: 'error' });
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -82,7 +92,7 @@ export default function ContactForm() {
         {studyCountry === 'Another country' && <label className="field full-field"><span>Country name *</span><input name="otherCountry" required placeholder="Enter the country name" /></label>}
         <label className="field full-field"><span>Tell us about your plans *</span><textarea name="message" rows="5" required placeholder="Your study interests, goals, or questions" /></label>
       </div>
-      <div className="form-submit"><button className="button button-gold" type="submit">Prepare my enquiry <span>↗</span></button><p className={status.type ? `form-status-${status.type}` : ''} role="status" aria-live="polite">{status.message}</p></div>
+      <div className="form-submit"><button className="button button-gold" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send enquiry'} <span>↗</span></button><p className={status.type ? `form-status-${status.type}` : ''} role="status" aria-live="polite">{status.message}</p></div>
       <p className="contact-email">Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
     </form>
   );

@@ -84,7 +84,7 @@ if (enquiryForm) {
     if (matchingLevel) studyLevel.value = matchingLevel.value;
   }
 
-  enquiryForm.addEventListener('submit', (event) => {
+  enquiryForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     status.classList.remove('form-status-error', 'form-status-success');
 
@@ -97,27 +97,40 @@ if (enquiryForm) {
       return;
     }
 
-    const recipient = (document.body.dataset.contactEmail || 'hareg9518@gmail.com').trim();
-
     const values = new FormData(enquiryForm);
     const studyCountry = values.get('studyCountry') === 'Another country'
       ? values.get('otherCountry')
       : values.get('studyCountry');
-    const body = [
-      `Name: ${values.get('name')}`,
-      `Email: ${values.get('email')}`,
-      `Phone / WhatsApp: ${values.get('phone') || 'Not provided'}`,
-      `Current country: ${values.get('country') || 'Not provided'}`,
-      `Study level: ${values.get('studyLevel') || 'Not selected'}`,
-      `Services requested: ${selectedServices.map((checkbox) => checkbox.value).join(', ')}`,
-      `Preferred study country: ${studyCountry}`,
-      '',
-      'Message:',
-      values.get('message'),
-    ].join('\n');
-    const subject = encodeURIComponent('EduBridge Africa study enquiry');
-    window.location.href = `mailto:${recipient}?subject=${subject}&body=${encodeURIComponent(body)}`;
-    status.textContent = 'Your email app should open with your enquiry ready to send.';
-    status.classList.add('form-status-success');
+    const submitButton = enquiryForm.querySelector('[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.firstChild.textContent = 'Sending… ';
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: values.get('name'),
+          email: values.get('email'),
+          phone: values.get('phone'),
+          country: values.get('country'),
+          studyLevel: values.get('studyLevel'),
+          services: selectedServices.map((checkbox) => checkbox.value),
+          studyCountry,
+          message: values.get('message'),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'We could not send your enquiry right now.');
+      status.textContent = 'Your enquiry has been sent. Our team will be in touch soon.';
+      status.classList.add('form-status-success');
+      enquiryForm.reset();
+      updateOtherCountry();
+    } catch (error) {
+      status.textContent = error.message || 'We could not send your enquiry right now. Please try again.';
+      status.classList.add('form-status-error');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.firstChild.textContent = 'Send enquiry ';
+    }
   });
 }
