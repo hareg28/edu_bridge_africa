@@ -84,16 +84,14 @@ if (enquiryForm) {
     if (matchingLevel) studyLevel.value = matchingLevel.value;
   }
 
-  enquiryForm.addEventListener('submit', (event) => {
+  enquiryForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
     status.classList.remove('form-status-error', 'form-status-success');
 
-    if (!enquiryForm.reportValidity()) {
-      event.preventDefault();
-      return;
-    }
+    if (!enquiryForm.reportValidity()) return;
+
     const selectedServices = [...enquiryForm.querySelectorAll('[name="service"]:checked')];
     if (selectedServices.length === 0) {
-      event.preventDefault();
       status.textContent = 'Please choose at least one service so we know how to help.';
       status.classList.add('form-status-error');
       enquiryForm.querySelector('[name="service"]').focus();
@@ -103,41 +101,47 @@ if (enquiryForm) {
     const submitButton = enquiryForm.querySelector('[type="submit"]');
     submitButton.disabled = true;
     if (submitButton.firstChild) submitButton.firstChild.textContent = 'Sending… ';
+    status.textContent = 'Sending your enquiry…';
 
-    // Background call to /api/contact in case Resend is configured (3s max timeout)
+    const values = new FormData(enquiryForm);
+    const studyCountry = values.get('studyCountry') === 'Another country'
+      ? values.get('otherCountry')
+      : values.get('studyCountry');
+
+    const payload = {
+      access_key: 'f90140af-459c-4748-9ce8-495b734ea831',
+      subject: 'EduBridge Africa — New Student Enquiry',
+      name: values.get('name'),
+      email: values.get('email'),
+      phone: values.get('phone') || 'Not provided',
+      current_country: values.get('country') || 'Not provided',
+      study_level: values.get('studyLevel') || 'Not specified',
+      services_interested: selectedServices.map((cb) => cb.value).join(', '),
+      study_country: studyCountry,
+      message: values.get('message'),
+    };
+
     try {
-      const values = new FormData(enquiryForm);
-      const studyCountry = values.get('studyCountry') === 'Another country'
-        ? values.get('otherCountry')
-        : values.get('studyCountry');
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      fetch('/api/contact', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          name: values.get('name'),
-          email: values.get('email'),
-          phone: values.get('phone'),
-          country: values.get('country'),
-          studyLevel: values.get('studyLevel'),
-          services: selectedServices.map((checkbox) => checkbox.value),
-          studyCountry,
-          message: values.get('message'),
-        }),
-      }).catch(() => {}).finally(() => clearTimeout(timeoutId));
-    } catch {}
-
-    // Form submits into the hidden iframe in the background without navigating
-    setTimeout(() => {
-      status.textContent = 'Thank you! Your enquiry has been sent. Our team will be in touch soon.';
-      status.classList.remove('form-status-error');
-      status.classList.add('form-status-success');
-      enquiryForm.reset();
-      updateOtherCountry();
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        status.textContent = '✅ Thank you! Your enquiry has been sent. Our team will be in touch soon.';
+        status.classList.add('form-status-success');
+        enquiryForm.reset();
+        updateOtherCountry();
+      } else {
+        throw new Error(data.message || 'Submission failed');
+      }
+    } catch {
+      status.textContent = 'Something went wrong — please email us directly at hareg9518@gmail.com';
+      status.classList.add('form-status-error');
+    } finally {
       submitButton.disabled = false;
       if (submitButton.firstChild) submitButton.firstChild.textContent = 'Send enquiry ';
-    }, 1200);
+    }
   });
 }
