@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import HomeContactForm from '../components/HomeContactForm';
 
 export default function HomePage() {
   return <>
@@ -22,8 +23,6 @@ export default function HomePage() {
       </div>
     </section>
 
-    <section className="simple-steps"><div className="steps-inner"><div><span className="section-kicker light-kicker">THREE SIMPLE STEPS</span><h2>From curious<br />to <em>confident.</em></h2><Link className="text-link steps-link" href="/contact">Start a conversation <span>↗</span></Link></div><div className="step-list"><Link href="/contact"><span>01</span><b>Tell us what you want to study</b><i>↗</i></Link><Link href="/programs"><span>02</span><b>Explore the options that fit</b><i>↗</i></Link><Link href="/services"><span>03</span><b>Plan your next step</b><i>↗</i></Link></div></div></section>
-
-    <section className="simple-contact"><span className="section-kicker">READY WHEN YOU ARE</span><h2>Let’s talk about<br /><em>what’s possible.</em></h2><Link className="button button-gold" href="/contact">Contact EduBridge <span>↗</span></Link></section>
+    <section className="home-contact" id="contact"><div className="home-contact-copy"><span className="section-kicker">START HERE</span><h2>What are you<br /><em>planning next?</em></h2><p>Tell us what you’re looking for.</p><Link className="underlined-link" href="/enquire">Share more about your study plans <span>↗</span></Link></div><HomeContactForm /></section>
   </>;
 }

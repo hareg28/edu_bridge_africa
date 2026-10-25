@@ -10,7 +10,7 @@ const links = [
   ['About Us', '/about'],
   ['Programs', '/programs'],
   ['Services', '/services'],
-  ['Contact', '/contact'],
+  ['Partners', '/contact'],
 ];
 
 function BrandMark() {

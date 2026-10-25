@@ -9,7 +9,7 @@ export function ProgramCard({ tone, number, label, icon, title, description, ser
     <article className={`program-card ${tone}`}>
       <div className="card-top"><span className="program-num">{number} / {label}</span><span className="program-icon">{icon}</span></div>
       <h3>{title}</h3><p>{description}</p>
-      <Link href={`/contact?service=${encodeURIComponent(service)}`}>Explore this path <span>↗</span></Link>
+      <Link href={`/enquire?service=${encodeURIComponent(service)}`}>Explore this path <span>↗</span></Link>
     </article>
   );
 }
@@ -19,7 +19,7 @@ export function CallToAction({ kicker = 'YOUR FUTURE. YOUR EDUCATION. YOUR WORLD
     <section className="cta-panel">
       <Kicker light>{kicker}</Kicker>
       <h2>{title}<br /><em>{emphasis}</em></h2>
-      <Link className="button button-gold" href="/contact">{button} <span>↗</span></Link>
+      <Link className="button button-gold" href="/enquire">{button} <span>↗</span></Link>
     </section>
   );
 }
