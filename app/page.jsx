@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import HomeContactForm from '../components/HomeContactForm';
+import ContactForm from '../components/ContactForm';
 
 export default function HomePage() {
   return <>
@@ -11,7 +11,7 @@ export default function HomePage() {
         <Link className="button button-gold" href="/programs">Explore study options <span>↗</span></Link>
         <div className="hero-prompt"><span className="prompt-dot" /> Based in Addis Ababa, Ethiopia</div>
       </div>
-      <div className="hero-orbit" aria-hidden="true"><span>✳</span><i /><b /></div>
+      <img className="home-hero-photo" src="/assets/home-campus.png" alt="Students walking together on a university campus" />
     </section>
 
     <section className="quick-links section-wrap" aria-label="Explore EduBridge">
@@ -23,6 +23,6 @@ export default function HomePage() {
       </div>
     </section>
 
-    <section className="home-contact" id="contact"><div className="home-contact-copy"><span className="section-kicker">START HERE</span><h2>What are you<br /><em>planning next?</em></h2><p>Tell us what you’re looking for.</p><Link className="underlined-link" href="/enquire">Share more about your study plans <span>↗</span></Link></div><HomeContactForm /></section>
+    <section className="home-contact home-contact-full" id="contact"><ContactForm /></section>
   </>;
 }
