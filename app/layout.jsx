@@ -4,11 +4,11 @@ import SiteFooter from '../components/SiteFooter';
 
 export const metadata = {
   title: {
-    default: 'EduBridge Africa — Your Global Education Journey Starts Here',
-    template: '%s | EduBridge Africa',
+    default: 'TrainHub Africa — Learn. Grow. Succeed.',
+    template: '%s | TrainHub Africa',
   },
   description:
-    'Explore international study opportunities with EduBridge Africa. Get personal guidance for bachelor’s, master’s, PhD and professional training programmes.',
+    'TrainHub Africa connects students and professionals with international education, training and career opportunities.',
 };
 
 export default function RootLayout({ children }) {

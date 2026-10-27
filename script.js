@@ -110,7 +110,7 @@ if (enquiryForm) {
 
     const payload = {
       access_key: 'f90140af-459c-4748-9ce8-495b734ea831',
-      subject: 'EduBridge Africa — New Student Enquiry',
+      subject: 'TrainHub Africa — New Student Enquiry',
       name: values.get('name'),
       email: values.get('email'),
       phone: values.get('phone') || 'Not provided',

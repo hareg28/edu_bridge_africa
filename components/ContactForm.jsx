@@ -61,7 +61,7 @@ export default function ContactForm() {
 
     const payload = {
       access_key: WEB3FORMS_KEY,
-      subject: 'EduBridge Africa — New Student Enquiry',
+      subject: 'TrainHub Africa — New Student Enquiry',
       name: values.get('name'),
       email: values.get('email'),
       phone: values.get('phone') || 'Not provided',

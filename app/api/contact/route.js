@@ -44,7 +44,7 @@ export async function POST(request) {
           from: sender,
           to: [recipient],
           reply_to: email,
-          subject: `EduBridge Africa enquiry from ${name}`,
+          subject: `TrainHub Africa enquiry from ${name}`,
           text: emailBody,
         }),
       });
@@ -67,7 +67,7 @@ export async function POST(request) {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'EduBridgeAfrica/1.0',
+        'User-Agent': 'TrainHubAfrica/1.0',
       },
       signal: controller.signal,
       body: JSON.stringify({
@@ -79,7 +79,7 @@ export async function POST(request) {
         services: services.join(', '),
         studyCountry: enquiry.studyCountry || 'Not selected',
         message,
-        _subject: `EduBridge Africa enquiry from ${name}`,
+        _subject: `TrainHub Africa enquiry from ${name}`,
         _template: 'table',
         _captcha: 'false',
       }),

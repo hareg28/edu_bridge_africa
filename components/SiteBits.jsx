@@ -14,7 +14,7 @@ export function ProgramCard({ tone, number, label, icon, title, description, ser
   );
 }
 
-export function CallToAction({ kicker = 'YOUR FUTURE. YOUR EDUCATION. YOUR WORLD.', title, emphasis, button = 'Start a conversation' }) {
+export function CallToAction({ kicker = 'LEARN. GROW. SUCCEED.', title, emphasis, button = 'Start a conversation' }) {
   return (
     <section className="cta-panel">
       <Kicker light>{kicker}</Kicker>

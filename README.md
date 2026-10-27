@@ -1,6 +1,6 @@
-# EduBridge Africa
+# TrainHub Africa
 
-EduBridge Africa is a Next.js website for international study guidance.
+TrainHub Africa is a Next.js website for international study guidance.
 
 ## Run it locally
 
@@ -20,7 +20,7 @@ The enquiry form delivers submissions directly to `hareg9518@gmail.com`. Submiss
 ```text
 RESEND_API_KEY=your-resend-api-key
 CONTACT_EMAIL=hareg9518@gmail.com
-CONTACT_FROM_EMAIL=EduBridge Africa <enquiries@your-verified-domain.com>
+CONTACT_FROM_EMAIL=TrainHub Africa <enquiries@your-verified-domain.com>
 ```
 
 The form submits directly in the website page without opening any external email apps, displaying an immediate in-page confirmation.
