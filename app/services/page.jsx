@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Kicker } from '../../components/SiteBits';
 
-export const metadata = { title: 'Our Services' };
+export const metadata = { title: 'Our Services', description: 'Explore TrainHub Africa’s education, training, and student support services.' };
 
 const services = [
   { title: 'Free Consultation & Profile Screening', summary: 'Start with your goals and what you bring.', description: 'Receive initial guidance on your study goals, preferred destinations, academic background, English proficiency, professional experience, interests, and budget. We use this information to help identify suitable study opportunities and plan your next steps.' },
@@ -16,8 +16,8 @@ const services = [
 
 export default function ServicesPage() {
   return <>
-    <section className="inner-hero service-hero"><Kicker>OUR SERVICES</Kicker><h1>Your global education<br /><em>journey starts here.</em></h1><p>At TrainHub Africa, we guide students and professionals toward global education and career opportunities. From university selection to applications and pre-departure preparation, we make the journey simpler and clearer.</p><Link className="button button-gold" href="/enquire">Talk to our team <span>↗</span></Link><img src="/assets/kent-state.png" alt="Students exploring education opportunities at Kent State University" /></section>
-    <section className="services-list section-wrap" id="services"><div className="section-heading"><div><Kicker>HOW WE CAN HELP</Kicker><h2>Explore our<br /><em>services.</em></h2></div><p>Select a service to see how we can support you.</p></div><div className="service-accordion-grid">{services.map(({ title, summary, description }, i) => <details className="service-accordion" key={title}><summary><span className="service-number">{String(i + 1).padStart(2, '0')}</span><span className="service-accordion-copy"><strong>{title}</strong><small>{summary}</small></span><span className="service-accordion-arrow" aria-hidden="true">＋</span></summary><div className="service-accordion-detail"><p>{description}</p><Link href="/enquire">Ask us about this <span>↗</span></Link></div></details>)}</div></section>
+    <section className="inner-hero service-hero service-banner"><Kicker>TRAINHUB AFRICA PLC</Kicker><h1>Your Global<br /><em>Education Partner</em></h1><p>Study. Grow. Build Your Future.</p><Link className="button button-gold" href="#services">Explore our services <span>↘</span></Link><img src="/assets/services-student.webp" alt="A student holding a notebook on an international university campus" width="440" height="365" /></section>
+    <section className="services-list section-wrap" id="services"><div className="section-heading"><div><Kicker>OUR SERVICES</Kicker><h2>Guidance at<br /><em>every step.</em></h2></div><p className="service-heading-copy">At TrainHub Africa, we guide students and professionals toward global education and career opportunities. From personalized guidance and university selection to application support and pre-departure preparation, we make the journey to international education simpler, clearer, and more accessible.</p></div><div className="service-accordion-grid">{services.map(({ title, summary, description }, i) => <details className="service-accordion" key={title}><summary><span className="service-number">{String(i + 1).padStart(2, '0')}</span><span className="service-accordion-copy"><strong>{title}</strong><small>{summary}</small></span><span className="service-accordion-arrow" aria-hidden="true">＋</span></summary><div className="service-accordion-detail"><p>{description}</p><Link href="/enquire">Ask us about this <span>↗</span></Link></div></details>)}</div></section>
     <section className="service-note"><Kicker>YOUR NEXT STEP</Kicker><h2>Explore opportunities.<br /><em>Build your future.</em></h2><Link className="underlined-link" href="/enquire">Start a free consultation <span>↗</span></Link></section>
   </>;
 }
