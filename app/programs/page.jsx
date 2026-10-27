@@ -11,6 +11,6 @@ export default function ProgramsPage() {
       <ProgramCard tone="card-lilac" number="03" label="RESEARCH" icon="◎" title="PhD programmes" description="Explore doctoral study and research opportunities in your field." service="PhD and research" />
       <ProgramCard tone="card-green" number="04" label="PROFESSIONAL" icon="↗" title="Short-term training" description="Build practical skills through executive learning and specialised training." service="Short-term training" />
     </div></section>
-    <section className="inner-hero program-hero"><Kicker>STUDY PROGRAMS</Kicker><h1>Choose a direction.<br /><em>Make it your own.</em></h1><p>Explore study paths at every stage of your journey.</p><Link className="button button-gold" href="/enquire">Click us and we will do the rest <span>↗</span></Link><img src="/assets/destinations.png" alt="A student considering international university destinations" /></section>
+    <section className="inner-hero program-hero"><Kicker>STUDY PROGRAMS</Kicker><h1>Choose a direction.<br /><em>Make it your own.</em></h1><p>Explore study paths at every stage of your journey.</p><Link className="button button-gold" href="/enquire">Click us and we will do the rest <span>↗</span></Link><img src="/assets/program-student.webp" alt="A student holding a notebook and looking toward her future" width="390" height="500" /></section>
   </>;
 }

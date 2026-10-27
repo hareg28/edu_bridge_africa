@@ -30,7 +30,7 @@ document.querySelectorAll('#year, [data-year]').forEach((year) => {
 const themeToggle = document.querySelector('#theme-toggle');
 let savedTheme;
 try {
-  savedTheme = localStorage.getItem('edubridge-theme');
+  savedTheme = localStorage.getItem('trainhub-theme');
 } catch {
   savedTheme = null;
 }
@@ -50,7 +50,7 @@ if (themeToggle) {
     const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = nextTheme;
     try {
-      localStorage.setItem('edubridge-theme', nextTheme);
+      localStorage.setItem('trainhub-theme', nextTheme);
     } catch {
       // Keep the current page usable when browser storage is unavailable.
     }

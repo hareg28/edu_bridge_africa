@@ -6,7 +6,7 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('edubridge-theme');
+    const savedTheme = localStorage.getItem('trainhub-theme');
     const initialTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.dataset.theme = initialTheme;
     setTheme(initialTheme);
@@ -15,7 +15,7 @@ export default function ThemeToggle() {
   function toggleTheme() {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = nextTheme;
-    localStorage.setItem('edubridge-theme', nextTheme);
+    localStorage.setItem('trainhub-theme', nextTheme);
     setTheme(nextTheme);
   }
 
