@@ -60,3 +60,5 @@ html[data-theme="dark"] .service-banner{background:var(--navy)}
 @media(max-width:1000px){.service-accordion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-banner>img{width:40%}}
 @media(max-width:650px){.service-banner{min-height:500px;padding:52px 23px 215px!important;background:var(--navy)!important}.service-banner h1{max-width:100%;font-size:42px}.service-banner>p{font-size:14px;max-width:300px}.service-banner>img{top:auto!important;right:0;bottom:0;width:100%;max-width:none;height:220px;object-position:center 28%;mask-image:linear-gradient(180deg,transparent 0%,black 24%)}.service-heading-copy{font-size:13px!important}.service-accordion-grid{grid-template-columns:1fr}.service-accordion summary{min-height:170px;padding:20px}.service-accordion-copy strong{font-size:16px}}
 @media(max-width:650px){.home-contact{grid-template-columns:1fr;gap:24px;padding:58px 22px}.home-contact-form{padding:22px 18px}.home-contact-copy h2{font-size:39px}}
+.program-list .section-heading{justify-content:flex-start}
+.services-list .section-heading{align-items:center}
